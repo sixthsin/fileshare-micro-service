@@ -36,15 +36,19 @@ func NewAuthHandler(router *gin.Engine, deps AuthHandlerDeps) {
 func (handler *AuthHandler) Register(c *gin.Context) {
 	var req RegisterRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "Wrong data: " + err.Error(),
+		c.JSON(http.StatusBadRequest, ErrorResponse{
+			Status:  "error",
+			Code:    http.StatusBadRequest,
+			Message: err.Error(),
 		})
 		return
 	}
 	email, err := handler.AuthService.Register(req.Email, req.Password, req.Username)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": err.Error(),
+		c.JSON(http.StatusInternalServerError, ErrorResponse{
+			Status:  "error",
+			Code:    http.StatusInternalServerError,
+			Message: err.Error(),
 		})
 		return
 	}
@@ -52,27 +56,45 @@ func (handler *AuthHandler) Register(c *gin.Context) {
 		Email: email,
 	})
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": err.Error(),
+		c.JSON(http.StatusInternalServerError, ErrorResponse{
+			Status:  "error",
+			Code:    http.StatusInternalServerError,
+			Message: err.Error(),
 		})
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{
-		"message": MsgRegisteredSuccessfully,
-		"Token":   token,
-	})
+	c.JSON(http.StatusOK, RegisterResponse{Token: token})
 }
 
 func (handler *AuthHandler) Login(c *gin.Context) {
 	var req LoginRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "Wrong data: " + err.Error(),
+		c.JSON(http.StatusBadRequest, ErrorResponse{
+			Status:  "error",
+			Code:    http.StatusBadRequest,
+			Message: err.Error(),
 		})
 		return
 	}
-
-	c.JSON(http.StatusOK, gin.H{
-		"message": MsgLoggedSuccessfully,
+	email, err := handler.AuthService.Login(req.Email, req.Password)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, ErrorResponse{
+			Status:  "error",
+			Code:    http.StatusInternalServerError,
+			Message: err.Error(),
+		})
+		return
+	}
+	token, err := jwt.NewJWT(handler.Config.Auth.Secret).Create(jwt.JWTData{
+		Email: email,
 	})
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, ErrorResponse{
+			Status:  "error",
+			Code:    http.StatusInternalServerError,
+			Message: err.Error(),
+		})
+		return
+	}
+	c.JSON(http.StatusOK, LoginResponse{Token: token})
 }
