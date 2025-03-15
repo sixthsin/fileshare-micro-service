@@ -27,6 +27,7 @@ func (j *JWT) Create(data JWTData) (string, error) {
 		"email":   data.Email,
 		"exp":     time.Now().Add(time.Hour * 24).Unix(),
 	})
+
 	s, err := t.SignedString([]byte(j.Secret))
 	if err != nil {
 		return "", err

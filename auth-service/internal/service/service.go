@@ -37,6 +37,7 @@ func (s *AuthService) Register(email, password, username string) (string, uint, 
 	if existedEmail != nil {
 		return "", 0, errors.New(ErrEmailExists)
 	}
+
 	existedUsername, err := s.UserRepository.FindByUsername(username)
 	if err != nil {
 		return "", 0, nil
@@ -44,16 +45,20 @@ func (s *AuthService) Register(email, password, username string) (string, uint, 
 	if existedUsername != nil {
 		return "", 0, errors.New(ErrUsernameExists)
 	}
+
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
 		return "", 0, err
 	}
+
 	user := &model.User{
 		Email:    email,
 		Password: string(hashedPassword),
 		Username: username,
 	}
+
 	s.UserRepository.Create(user)
+
 	return user.Email, user.ID, nil
 }
 
@@ -62,13 +67,16 @@ func (s *AuthService) Login(email, password string) (string, uint, error) {
 	if err != nil {
 		return "", 0, nil
 	}
+
 	if existedUser == nil {
 		return "", 0, errors.New(ErrWrongCredentials)
 	}
+
 	err = bcrypt.CompareHashAndPassword([]byte(existedUser.Password), []byte(password))
 	if err != nil {
 		return "", 0, errors.New(ErrWrongCredentials)
 	}
+
 	return existedUser.Email, existedUser.ID, nil
 }
 
@@ -79,18 +87,22 @@ func (s *AuthService) ValidateToken(tokenString string) (*UserResponse, error) {
 	if err != nil || !token.Valid {
 		return &UserResponse{IsValid: false}, errors.New(ErrInvalidToken)
 	}
+
 	claims, ok := token.Claims.(jwt.MapClaims)
 	if !ok {
 		return &UserResponse{IsValid: false}, errors.New(ErrInvalidTokenClaims)
 	}
+
 	expirationTime := int64(claims["exp"].(float64))
 	if time.Now().Unix() > expirationTime {
 		return &UserResponse{IsValid: false}, errors.New(ErrTokenExpired)
 	}
+
 	idValue, ok := claims["user_id"]
 	if !ok {
 		return &UserResponse{IsValid: false}, errors.New(ErrInvalidTokenClaims)
 	}
+
 	var id string
 	switch v := idValue.(type) {
 	case float64:
@@ -100,7 +112,9 @@ func (s *AuthService) ValidateToken(tokenString string) (*UserResponse, error) {
 	default:
 		return &UserResponse{IsValid: false}, errors.New(ErrInvalidTokenClaims)
 	}
+
 	email := claims["email"].(string)
+
 	return &UserResponse{
 		ID:      id,
 		Email:   email,
