@@ -3,7 +3,7 @@ package main
 import (
 	"auth-service/config"
 	"auth-service/generated/auth"
-	"auth-service/internal/authgrpc"
+	grpcauth "auth-service/internal/grpc/auth"
 	"auth-service/internal/handler"
 	"auth-service/internal/repository"
 	"auth-service/internal/service"
@@ -53,7 +53,7 @@ func main() {
 	}
 
 	// gRPC Handlers
-	grpcHandler := authgrpc.NewGrpcHandler(authService)
+	grpcHandler := grpcauth.NewGrpcHandler(authService)
 
 	grpcServer := grpc.NewServer()
 	auth.RegisterAuthServiceServer(grpcServer, grpcHandler)

@@ -1,4 +1,4 @@
-package authgrpc
+package grpcauth
 
 import (
 	"auth-service/generated/auth"
