@@ -2,7 +2,7 @@ package main
 
 import (
 	"auth-service/config"
-	"auth-service/generated/auth"
+	"auth-service/generated/shared-proto/auth"
 	grpcauth "auth-service/internal/grpc/auth"
 	"auth-service/internal/handler"
 	"auth-service/internal/repository"

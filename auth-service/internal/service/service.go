@@ -5,6 +5,7 @@ import (
 	"auth-service/internal/model"
 	"auth-service/internal/repository"
 	"errors"
+	"strconv"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -72,7 +73,7 @@ func (s *AuthService) Login(email, password string) (string, uint, error) {
 }
 
 func (s *AuthService) ValidateToken(tokenString string) (*UserResponse, error) {
-	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+	token, err := jwt.ParseWithClaims(tokenString, jwt.MapClaims{}, func(token *jwt.Token) (interface{}, error) {
 		return []byte(s.Config.Auth.Secret), nil
 	})
 	if err != nil || !token.Valid {
@@ -86,7 +87,19 @@ func (s *AuthService) ValidateToken(tokenString string) (*UserResponse, error) {
 	if time.Now().Unix() > expirationTime {
 		return &UserResponse{IsValid: false}, errors.New(ErrTokenExpired)
 	}
-	id := claims["user_id"].(string)
+	idValue, ok := claims["user_id"]
+	if !ok {
+		return &UserResponse{IsValid: false}, errors.New(ErrInvalidTokenClaims)
+	}
+	var id string
+	switch v := idValue.(type) {
+	case float64:
+		id = strconv.FormatFloat(v, 'f', -1, 64)
+	case string:
+		id = v
+	default:
+		return &UserResponse{IsValid: false}, errors.New(ErrInvalidTokenClaims)
+	}
 	email := claims["email"].(string)
 	return &UserResponse{
 		ID:      id,
