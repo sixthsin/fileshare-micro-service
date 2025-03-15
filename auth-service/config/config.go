@@ -10,7 +10,8 @@ import (
 type Config struct {
 	Db   DbConfig
 	Auth AuthConfig
-	Port PortConfig
+	Rest RestConfig
+	Grpc GrpcConfig
 }
 
 type DbConfig struct {
@@ -21,7 +22,11 @@ type AuthConfig struct {
 	Secret string
 }
 
-type PortConfig struct {
+type RestConfig struct {
+	Port string
+}
+
+type GrpcConfig struct {
 	Port string
 }
 
@@ -37,8 +42,11 @@ func LoadConfig() *Config {
 		Auth: AuthConfig{
 			Secret: os.Getenv("JWT_SECRET"),
 		},
-		Port: PortConfig{
-			Port: os.Getenv("PORT"),
+		Rest: RestConfig{
+			Port: os.Getenv("REST_API_PORT"),
+		},
+		Grpc: GrpcConfig{
+			Port: os.Getenv("GRPC_PORT"),
 		},
 	}
 }
