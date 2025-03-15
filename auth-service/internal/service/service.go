@@ -67,7 +67,6 @@ func (s *AuthService) Login(email, password string) (string, uint, error) {
 	if err != nil {
 		return "", 0, nil
 	}
-
 	if existedUser == nil {
 		return "", 0, errors.New(ErrWrongCredentials)
 	}
