@@ -8,9 +8,8 @@ import (
 )
 
 func main() {
-	// main.go или другой файл
 	authClient := grpcauth.NewAuthClient("localhost:50051")
-	token := "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IlRlc3RFbWFpbDEyMzQ1Njc4QHRlc3QuY29tIiwiZXhwIjoxNzQyMTM2ODc2LCJ1c2VyX2lkIjoyMX0.uhFMt5APfBNRKfi4QYfxlGFaR1Wmhppe3GsFqszspio"
+	token := "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IlRlc3RFbWFpbDg4QHRlc3QuY29tIiwiZXhwIjoxNzQzNjc3MjY0LCJ1c2VyX2lkIjoyMn0.k0XfaSQLPpZ-YZ_XZ933vS9re8_N9XUfYqx9FxKPYDs"
 
 	response, err := authClient.ValidateToken(context.Background(), token)
 	if err != nil {
