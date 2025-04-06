@@ -8,7 +8,6 @@ import (
 	"auth-service/internal/repository"
 	"auth-service/internal/service"
 	"auth-service/pkg/db"
-	"fmt"
 	"log"
 	"net"
 
@@ -40,7 +39,6 @@ func main() {
 	})
 
 	go func(port string) {
-		fmt.Println(port)
 		if err := router.Run(":" + port); err != nil {
 			log.Fatalf("Failed to start REST API server: %v", err)
 		}
