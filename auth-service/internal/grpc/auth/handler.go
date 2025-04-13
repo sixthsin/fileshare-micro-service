@@ -1,8 +1,8 @@
 package grpcauth
 
 import (
-	"auth-service/generated/shared-proto/auth"
 	"auth-service/internal/service"
+	"auth-service/pkg/grpc/auth"
 	"fmt"
 	"time"
 
@@ -36,8 +36,8 @@ func (handler *GrpcHandler) ValidateToken(ctx context.Context, req *auth.TokenRe
 	}
 
 	return &auth.UserResponse{
-		UserId:  user.ID,
-		Email:   user.Email,
-		IsValid: true,
+		Username: user.Username,
+		Email:    user.Email,
+		IsValid:  true,
 	}, nil
 }

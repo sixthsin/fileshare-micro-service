@@ -44,7 +44,7 @@ func (handler *AuthHandler) Register(c *gin.Context) {
 		return
 	}
 
-	email, userID, err := handler.AuthService.Register(req.Email, req.Password, req.Username)
+	email, username, err := handler.AuthService.Register(req.Email, req.Password, req.Username)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, ErrorResponse{
 			Status:  "error",
@@ -55,8 +55,8 @@ func (handler *AuthHandler) Register(c *gin.Context) {
 	}
 
 	token, err := jwt.NewJWT(handler.Config.Auth.Secret).Create(jwt.JWTData{
-		UserID: userID,
-		Email:  email,
+		Username: username,
+		Email:    email,
 	})
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, ErrorResponse{
@@ -81,7 +81,7 @@ func (handler *AuthHandler) Login(c *gin.Context) {
 		return
 	}
 
-	email, userID, err := handler.AuthService.Login(req.Email, req.Password)
+	email, username, err := handler.AuthService.Login(req.Email, req.Password)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, ErrorResponse{
 			Status:  "error",
@@ -92,8 +92,8 @@ func (handler *AuthHandler) Login(c *gin.Context) {
 	}
 
 	token, err := jwt.NewJWT(handler.Config.Auth.Secret).Create(jwt.JWTData{
-		UserID: userID,
-		Email:  email,
+		Username: username,
+		Email:    email,
 	})
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, ErrorResponse{

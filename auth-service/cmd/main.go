@@ -2,12 +2,12 @@ package main
 
 import (
 	"auth-service/config"
-	"auth-service/generated/shared-proto/auth"
 	grpcauth "auth-service/internal/grpc/auth"
 	"auth-service/internal/handler"
 	"auth-service/internal/repository"
 	"auth-service/internal/service"
 	"auth-service/pkg/db"
+	"auth-service/pkg/grpc/auth"
 	"log"
 	"net"
 
