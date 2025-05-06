@@ -3,7 +3,6 @@ package grpcauth
 import (
 	"auth-service/internal/service"
 	"auth-service/pkg/grpc/auth"
-	"fmt"
 	"time"
 
 	"context"
@@ -31,7 +30,6 @@ func (handler *GrpcHandler) ValidateToken(ctx context.Context, req *auth.TokenRe
 
 	user, err := handler.service.ValidateToken(req.Token)
 	if err != nil || !user.IsValid {
-		fmt.Println(err)
 		return &auth.UserResponse{IsValid: false}, errors.New("invalid token")
 	}
 

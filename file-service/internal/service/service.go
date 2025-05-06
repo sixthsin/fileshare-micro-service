@@ -68,3 +68,11 @@ func (s *FileService) SaveFile(file io.Reader, filename string, fileSize int64, 
 
 	return fileHash, nil
 }
+
+func (s *FileService) GetFileByHash(hash string) (*model.FileMetadata, error) {
+	file, err := s.FileRepository.GetFileByHash(hash)
+	if err != nil {
+		return nil, err
+	}
+	return file, nil
+}

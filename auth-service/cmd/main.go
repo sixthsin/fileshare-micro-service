@@ -56,7 +56,6 @@ func main() {
 	grpcServer := grpc.NewServer()
 	auth.RegisterAuthServiceServer(grpcServer, grpcHandler)
 	log.Printf("Starting gRPC server on : %s\n", config.Grpc.Port)
-
 	if err := grpcServer.Serve(listenner); err != nil {
 		log.Fatalf("Failed to serve gRPC server: %v", err)
 	}

@@ -22,3 +22,12 @@ func (r *FileRepository) SaveFile(filePath string, fileMetadata *model.FileMetad
 	}
 	return nil
 }
+
+func (r *FileRepository) GetFileByHash(hash string) (*model.FileMetadata, error) {
+	var file model.FileMetadata
+	result := r.DB.DB.Where("hash = ?", hash).First(&file)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	return &file, nil
+}

@@ -6,6 +6,7 @@ import (
 	"file-service/internal/service"
 	"file-service/pkg/middleware"
 	"net/http"
+	"path/filepath"
 
 	"github.com/gin-gonic/gin"
 )
@@ -31,7 +32,7 @@ func NewFileShareHandler(router *gin.Engine, deps FileShareHandlerDeps) {
 	protected := router.Group("/file")
 	protected.Use(middleware.AuthMiddleware(handler.AuthClient))
 	{
-		protected.GET("/download/{hash}", handler.Download)
+		protected.GET("/download/:hash", handler.Download)
 		protected.POST("/upload", handler.Upload)
 	}
 }
@@ -81,5 +82,16 @@ func (h *FileShareHandler) Upload(c *gin.Context) {
 }
 
 func (h *FileShareHandler) Download(c *gin.Context) {
-
+	hash := c.Param("hash")
+	if hash == "" {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "Hash is required"})
+		return
+	}
+	file, err := h.FileService.GetFileByHash(hash)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusNotFound, gin.H{"error": "File not found"})
+	}
+	filePath := filepath.Join(h.Config.Storage.UploadDir, file.Filename)
+	c.File(filePath)
 }
+!= <= <- 
