@@ -7,8 +7,8 @@ import (
 )
 
 type JWTData struct {
-	UserID uint
-	Email  string
+	Username string
+	Email    string
 }
 
 type JWT struct {
@@ -23,10 +23,11 @@ func NewJWT(secret string) *JWT {
 
 func (j *JWT) Create(data JWTData) (string, error) {
 	t := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"user_id": data.UserID,
-		"email":   data.Email,
-		"exp":     time.Now().Add(time.Hour * 24).Unix(),
+		"username": data.Username,
+		"email":    data.Email,
+		"exp":      time.Now().Add(time.Hour * 24).Unix(),
 	})
+
 	s, err := t.SignedString([]byte(j.Secret))
 	if err != nil {
 		return "", err

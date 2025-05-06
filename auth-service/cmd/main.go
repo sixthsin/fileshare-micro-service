@@ -2,13 +2,12 @@ package main
 
 import (
 	"auth-service/config"
-	"auth-service/generated/auth"
 	grpcauth "auth-service/internal/grpc/auth"
 	"auth-service/internal/handler"
 	"auth-service/internal/repository"
 	"auth-service/internal/service"
 	"auth-service/pkg/db"
-	"fmt"
+	"auth-service/pkg/grpc/auth"
 	"log"
 	"net"
 
@@ -40,7 +39,6 @@ func main() {
 	})
 
 	go func(port string) {
-		fmt.Println(port)
 		if err := router.Run(":" + port); err != nil {
 			log.Fatalf("Failed to start REST API server: %v", err)
 		}
@@ -58,7 +56,6 @@ func main() {
 	grpcServer := grpc.NewServer()
 	auth.RegisterAuthServiceServer(grpcServer, grpcHandler)
 	log.Printf("Starting gRPC server on : %s\n", config.Grpc.Port)
-
 	if err := grpcServer.Serve(listenner); err != nil {
 		log.Fatalf("Failed to serve gRPC server: %v", err)
 	}

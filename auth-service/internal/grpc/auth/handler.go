@@ -1,8 +1,9 @@
 package grpcauth
 
 import (
-	"auth-service/generated/auth"
 	"auth-service/internal/service"
+	"auth-service/pkg/grpc/auth"
+	"time"
 
 	"context"
 	"errors"
@@ -18,13 +19,23 @@ func NewGrpcHandler(service *service.AuthService) *GrpcHandler {
 }
 
 func (handler *GrpcHandler) ValidateToken(ctx context.Context, req *auth.TokenRequest) (*auth.UserResponse, error) {
+	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
+	defer cancel()
+
+	select {
+	case <-ctx.Done():
+		return nil, ctx.Err()
+	default:
+	}
+
 	user, err := handler.service.ValidateToken(req.Token)
 	if err != nil || !user.IsValid {
 		return &auth.UserResponse{IsValid: false}, errors.New("invalid token")
 	}
+
 	return &auth.UserResponse{
-		UserId:  user.ID,
-		Email:   user.Email,
-		IsValid: true,
+		Username: user.Username,
+		Email:    user.Email,
+		IsValid:  true,
 	}, nil
 }
