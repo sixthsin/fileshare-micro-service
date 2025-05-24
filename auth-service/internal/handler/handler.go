@@ -103,5 +103,5 @@ func (handler *AuthHandler) Login(c *gin.Context) {
 		})
 		return
 	}
-	
+	c.JSON(http.StatusOK, LoginResponse{Token: token})
 }

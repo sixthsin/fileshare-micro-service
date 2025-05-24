@@ -94,4 +94,3 @@ func (h *FileShareHandler) Download(c *gin.Context) {
 	filePath := filepath.Join(h.Config.Storage.UploadDir, file.Filename)
 	c.File(filePath)
 }
-!= <= <- 
