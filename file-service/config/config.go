@@ -42,13 +42,13 @@ func LoadConfig() *Config {
 			Port: os.Getenv("GRPC_PORT"),
 		},
 		Db: DbConfig{
-			Dsn: os.Getenv("DSN"),
+			Dsn: os.Getenv("FILE_SERVICE_DSN"),
 		},
 		Storage: StorageConfig{
 			UploadDir: os.Getenv("UPLOAD_DIR"),
 		},
 		Rest: RestConfig{
-			Port: os.Getenv("REST_PORT"),
+			Port: os.Getenv("FILE_SERVICE_REST_PORT"),
 		},
 	}
 }

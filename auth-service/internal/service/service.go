@@ -56,9 +56,12 @@ func (s *AuthService) Register(email, password, username string) (string, string
 		Username: username,
 	}
 
-	s.UserRepository.Create(user)
+	createdUser, err := s.UserRepository.Create(user)
+	if err != nil {
+		return "", "", err
+	}
 
-	return user.Email, user.Username, nil
+	return createdUser.Email, createdUser.Username, nil
 }
 
 func (s *AuthService) Login(email, password string) (string, string, error) {

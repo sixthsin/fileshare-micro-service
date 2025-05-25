@@ -1,0 +1,89 @@
+services:
+  db-auth:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: ${AUTH_DB_NAME}
+      POSTGRES_USER: ${AUTH_DB_USER}
+      POSTGRES_PASSWORD: ${AUTH_DB_PASSWORD}
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_auth_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  db-files-metadata:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: ${FILES_DB_NAME}
+      POSTGRES_USER: ${FILES_DB_USER}
+      POSTGRES_PASSWORD: ${FILES_DB_PASSWORD}
+    ports:
+      - "5433:5432"
+    volumes:
+      - db_files_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  auth-migrate:
+    build:
+      context: ./auth-service
+      target: builder
+    image: auth-service-migrate:latest
+    command: go run migrations/auto.go
+    environment:
+      AUTH_SERVICE_DSN: ${AUTH_SERVICE_DSN}
+    depends_on:
+      - db-auth
+
+  auth-service:
+    build: ./auth-service
+    environment:
+      AUTH_SERVICE_DSN: ${AUTH_SERVICE_DSN}
+      JWT_SECRET: ${JWT_SECRET}
+      AUTH_SERVICE_REST_PORT: ${AUTH_SERVICE_REST_PORT}
+      GRPC_PORT: ${GRPC_PORT}
+    depends_on:
+      - db-auth
+      - auth-migrate
+    ports:
+      - "${AUTH_SERVICE_REST_PORT}:${AUTH_SERVICE_REST_PORT}"
+      - "${GRPC_PORT}:50051"
+  
+  file-service-migrate:
+    build:
+      context: ./file-service
+      target: builder
+    
+    command: go run migrations/auto.go
+    environment:
+      FILE_SERVICE_DSN: ${FILE_SERVICE_DSN}
+    depends_on:
+      - db-files-metadata
+  
+  file-service:
+    build: ./file-service
+    environment:
+      FILE_SERVICE_DSN: ${FILE_SERVICE_DSN}
+      FILE_SERVICE_REST_PORT: ${FILE_SERVICE_REST_PORT}
+      GRPC_HOST: ${GRPC_HOST}
+      GRPC_PORT: ${GRPC_PORT}
+      UPLOAD_DIR: ${UPLOAD_DIR}
+    depends_on:
+      - db-files-metadata
+      - file-service-migrate
+    ports:
+      - "${FILE_SERVICE_REST_PORT}:${FILE_SERVICE_REST_PORT}"
+    volumes:
+      - uploads_volume:${UPLOAD_DIR}
+
+volumes:
+  db_auth_data:
+  db_files_data:
+  uploads_volume:
