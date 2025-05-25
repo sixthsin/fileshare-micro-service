@@ -37,13 +37,13 @@ func LoadConfig() *Config {
 	}
 	return &Config{
 		Db: DbConfig{
-			Dsn: os.Getenv("DSN"),
+			Dsn: os.Getenv("AUTH_SERVICE_DSN"),
 		},
 		Auth: AuthConfig{
 			Secret: os.Getenv("JWT_SECRET"),
 		},
 		Rest: RestConfig{
-			Port: os.Getenv("REST_API_PORT"),
+			Port: os.Getenv("AUTH_SERVICE_REST_PORT"),
 		},
 		Grpc: GrpcConfig{
 			Port: os.Getenv("GRPC_PORT"),
